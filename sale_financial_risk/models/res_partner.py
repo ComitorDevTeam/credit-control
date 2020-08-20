@@ -22,8 +22,10 @@ class ResPartner(models.Model):
     def _compute_risk_sale_order(self):
         customers = self.filtered('customer')
         partners = customers | customers.mapped('child_ids')
+        states = self.env['sale.order.line'].get_risk_states()
         orders_group = self.env['sale.order.line'].read_group(
-            [('state', '=', 'sale'), ('order_partner_id', 'in', partners.ids)],
+            [('state', 'in', states),
+             ('order_partner_id', 'in', partners.ids)],
             ['order_partner_id', 'amt_to_invoice'],
             ['order_partner_id'])
         for partner in customers:
